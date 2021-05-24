@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://lll.l3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui" xmlns:f="http://java.sun.com/jsf/core"
+>
+
+<h:head>
+    <link rel="stylesheet" href="/css/primeflex.css"/>
+    <link rel="stylesheet" href="/css/vocab.css"/>
+
+</h:head>
+
+<h:body style="margin-left:50px">
+    <h:form>
+        <div class="p-grid p-dir-col">
+
+            <div class="p-grid p-jc-start p-ai-center" style="height: 50px;padding-top: 10px">
+
+                <div class="p-col-1" style="text-align: right">
+                    <p:outputLabel for="lg" value="Slovník:"/>
+                </div>
+                <div class="p-col-1">
+                    <p:selectOneMenu id="lg">
+                        <f:selectItems var="lg" value="#{lessonGroupBean.lessonGroups}" itemLabel="#{lg.name}"/>
+                    </p:selectOneMenu>
+                </div>
+
+            </div>
+
+
+            <div class="p-grid p-ai-stretch vertical-container">
+
+                <div class="p-col-4">
+                    <div class="box-stretched">
+                        <p:dataTable style="font-size: x-small" value="#{lessonBean.lessons}" var="l"
+                                     rows="30"
+                                     paginator="true"
+                                     selection="#{lessonBean.selectedLesson}"
+                                     selectionMode="single"
+                                     rowKey="#{l.id}"
+                                     paginatorPosition="top"
+                                     stripedRows="true"
+
+                                     paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}">
+                            <p:ajax event="rowSelect" listener="#{lessonBean.onRowSelect}" update="@(form)"/>
+                            <p:ajax event="rowUnselect" listener="#{lessonBean.onRowUnselect}"/>
+                            <p:column headerText="Lekce" width="50px">
+                                <h:outputText value="#{l.name}"/>
+                            </p:column>
+
+                            <p:column headerText="Slovíček" width="30px">
+                                <h:outputText value="#{l.totalCount}"/>
+                            </p:column>
+                            <p:column headerText="Naučeno" width="30px">
+                                <h:outputText value="#{l.correctCount}"/>
+                            </p:column>
+                            <p:column headerText="Úspěšnost" width="30px">
+                                <h:outputText value="#{l.percentage}"/>
+                            </p:column>
+
+                            <p:column headerText="Čas testu" width="40px">
+                                <h:outputText value="#{l.checkTime}">
+                                    <f:convertDateTime dateStyle="long"/>
+                                </h:outputText>
+                            </p:column>
+                        </p:dataTable>
+                    </div>
+                </div>
+                <div class="p-col-7">
+                    <h:panelGroup rendered="#{lessonBean.selectedLesson ne null}">
+                        <div class="box-stretched">
+                            <div class="p-grid p-dir-col">
+                                <div class="p-col box" style="height: 50px">
+                                    <p:outputLabel value="#{lessonBean.testWord}" style="color: blue"/>
+                                </div>
+                                <div class="p-col box" style="height: 50px">
+                                    <p:outputLabel id="result" value="#{lessonBean.result}" style="color: green"/>
+                                </div>
+                                <div class="p-col box" style="text-align: center;">
+                                    <p:inputText readonly="#{not lessonBean.translationEditable}"
+                                                 style="#{lessonBean.translationStyle}" autocomplete="off"
+                                                 id="translation"
+                                                 value="#{lessonBean.translation}">
+                                        <p:ajax event="keyup" update="translation result"
+                                                listener="#{lessonBean.handleTranslateEvent}"/>
+                                    </p:inputText>
+                                    <p:commandButton style="display: none" update="@form"
+                                                     action="#{lessonBean.action}"/>
+                                </div>
+                                <div class="p-col box">
+                                    <div class="p-grid p-justify-center" style="font-size: small;">
+                                        <div class="p-col-4 p-offset-2" style="padding: 0px;text-align: left">
+                                            <p:outputLabel value="Celkový počet slovíček v lekci:"/>
+                                        </div>
+                                        <div class="p-col-6" style="padding: 0px;text-align: left">
+                                            <p:outputLabel value="#{lessonBean.lessonTotalCount}"/>
+                                        </div>
+                                        <div class="p-col-4 p-offset-2" style="padding: 0px;text-align: left">
+                                            <p:outputLabel value="Zodpovězeno správně v tomto testu:"/>
+                                        </div>
+                                        <div class="p-col-6" style="padding: 0px;text-align: left">
+                                            <p:outputLabel value="#{lessonBean.lessonTotalCorrect}"/>
+                                        </div>
+                                        <div class="p-col-4 p-offset-2" style="padding: 0px;text-align: left">
+                                            <p:outputLabel value="Úspěšnost slovíčka v tomto testu:"/>
+                                        </div>
+                                        <div class="p-col-6" style="padding: 0px;text-align: left">
+                                            <p:outputLabel value="#{lessonBean.wordLesson}"/>
+                                        </div>
+                                        <div class="p-col-4 p-offset-2" style="padding: 0px;text-align: left">
+                                            <p:outputLabel value="Celkový počet úspěšných odpovědí z historie::"/>
+                                        </div>
+                                        <div class="p-col-6" style="padding: 0px;text-align: left">
+                                            <p:outputLabel value="#{lessonBean.wordTotalCorrect}"/>
+                                        </div>
+
+                                        <div class="p-col-4 p-offset-2" style="padding: 0px;text-align: left">
+                                            <p:outputLabel value="Celkový počet neúspěšných odpovědí z historie:"/>
+                                        </div>
+                                        <div class="p-col-6" style="padding: 0px;text-align: left">
+                                            <p:outputLabel value="#{lessonBean.wordTotalIncorrect}"/>
+                                        </div>
+
+                                        <div class="p-col-4 p-offset-2" style="padding: 0px;text-align: left">
+                                            <p:outputLabel value="Čas poslední úspěšné odpovědi:"/>
+                                        </div>
+                                        <div class="p-col-6" style="padding: 0px;text-align: left">
+                                            <p:outputLabel value="#{lessonBean.lastCorrectAnswer}"/>
+                                        </div>
+
+                                        <div class="p-col-4 p-offset-2" style="padding: 0px;text-align: left">
+                                            <p:outputLabel value="Čas poslední neúspěšné odpovědi:"/>
+                                        </div>
+                                        <div class="p-col-6" style="padding: 0px;text-align: left">
+                                            <p:outputLabel value="#{lessonBean.lastIncorrectAnswer}"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="p-col box">
+                                    <p:dataTable id="lessonCheckTable" style="font-size: x-small"
+                                                 value="#{lessonBean.lessonChecks}" var="lc"
+                                                 rows="5"
+                                                 paginator="true"
+                                                 paginatorPosition="top"
+                                                 paginatorAlwaysVisible="false"
+                                                 stripedRows="true">
+
+                                        <p:column headerText="Čas přezkoušení" width="50px">
+                                            <h:outputText value="#{lc.time}">
+                                            </h:outputText>
+                                        </p:column>
+
+                                        <p:column headerText="Celkem slovíček" width="30px">
+                                            <h:outputText value="#{lc.totalCount}"/>
+                                        </p:column>
+                                        <p:column headerText="Zodpovězeno" width="30px">
+                                            <h:outputText value="#{lc.correctCount}"/>
+                                        </p:column>
+                                        <p:column headerText="Úspěšnost" width="30px">
+                                            <h:outputText value="#{lc.percentage}"/>
+                                        </p:column>
+
+                                        <p:column headerText="Délka testu" width="40px">
+                                            <h:outputText value="#{lc.durationFormated}">
+                                            </h:outputText>
+                                        </p:column>
+                                    </p:dataTable>
+                                </div>
+                                <div class="p-col box" style="font-size: small;text-align: left">
+                                    <div class="p-grid">
+                                        <div class="p-col-4 p-offset-2" style="padding: 0px;text-align: left">
+                                            <p:outputLabel value="Počet lekcí:"/>
+                                        </div>
+                                        <div class="p-col-6" style="padding: 0px;text-align: left">
+                                            <p:outputLabel value="#{lessonBean.lessonCount}"/>
+                                        </div>
+
+                                        <div class="p-col-4 p-offset-2" style="padding: 0px;text-align: left">
+                                            <p:outputLabel value="Celkový počet slovíček ve slovníku:"/>
+                                        </div>
+                                        <div class="p-col-6" style="padding: 0px;text-align: left">
+                                            <p:outputLabel value="#{lessonBean.wordTotalVocabulary}"/>
+                                        </div>
+
+                                        <div class="p-col-4 p-offset-2" style="padding: 0px;text-align: left">
+                                            <p:outputLabel value="Počet unikátních slovíček ve slovníku:"/>
+                                        </div>
+                                        <div class="p-col-6" style="padding: 0px;text-align: left">
+                                            <p:outputLabel value="#{lessonBean.wordTotalDistincVocabulary}"/>
+                                        </div>
+
+
+                                        <div class="p-col-4 p-offset-2" style="padding: 0px;text-align: left">
+                                            <p:outputLabel value="Celkový počet naučených slovíček ze slovníku:"/>
+                                        </div>
+                                        <div class="p-col-6" style="padding: 0px;text-align: left">
+                                            <p:outputLabel value="#{lessonBean.wordTotalVocabularyCorrect}"/>
+                                        </div>
+
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </h:panelGroup>
+                </div>
+            </div>
+
+        </div>
+
+    </h:form>
+</h:body>
+</html>
